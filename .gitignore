@@ -30,3 +30,15 @@ $RECYCLE.BIN/
 *.log
 *.tmp
 Publish_Ready_For_USB/
+
+## Android & Gradle
+.gradle/
+build/
+**/build/
+local.properties
+**/local.properties
+Android/
+Loggy/
+TGBot/
+
+

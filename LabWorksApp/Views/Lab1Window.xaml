@@ -1,0 +1,266 @@
+<Window x:Class="LabWorksApp.Views.Lab1Window"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:components="clr-namespace:LabWorksApp.Views.Components"
+        Title="Лабораторная работа №1 — Метод половинного деления (дихотомии)" 
+        Height="800" Width="1180" MinHeight="650" MinWidth="950"
+        WindowStartupLocation="CenterScreen"
+        Background="#0F172A" Foreground="#F8FAFC">
+
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#F8FAFC" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="#1E293B" />
+            <Setter Property="Foreground" Value="#F8FAFC" />
+            <Setter Property="BorderBrush" Value="#475569" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="6,4" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style TargetType="RadioButton">
+            <Setter Property="Foreground" Value="#F8FAFC" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="0,0,12,0" />
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" /> <!-- WPF Menu (MenuStrip) -->
+            <RowDefinition Height="Auto" /> <!-- Панель ввода параметров: f(x), a, b, e -->
+            <RowDefinition Height="*" />    <!-- График и карточка результатов -->
+            <RowDefinition Height="220" MinHeight="140" /> <!-- DataGrid таблицы итераций -->
+            <RowDefinition Height="Auto" /> <!-- Строка состояния -->
+        </Grid.RowDefinitions>
+
+        <!-- 1. MenuStrip (WPF Menu) -->
+        <Menu Grid.Row="0" Background="#1E293B" Foreground="#F8FAFC" Padding="4,2" BorderBrush="#334155" BorderThickness="0,0,0,1">
+            <MenuItem Header="_Файл" Foreground="#F8FAFC">
+                <MenuItem Header="_Экспорт таблицы итераций в файл..." Click="MenuExport_Click" Foreground="#0F172A" />
+                <Separator />
+                <MenuItem Header="_Закрыть окно" Click="MenuClose_Click" Foreground="#0F172A" />
+            </MenuItem>
+
+            <MenuItem Header="_Действия" Foreground="#F8FAFC">
+                <MenuItem Header="_Рассчитать (дихотомия)" Click="BtnCalculate_Click" Foreground="#0F172A" FontWeight="Bold" />
+                <MenuItem Header="_Построить график" Click="BtnPlot_Click" Foreground="#0F172A" />
+                <MenuItem Header="_Очистить всё" Click="BtnClear_Click" Foreground="#0F172A" />
+            </MenuItem>
+
+            <MenuItem Header="_Примеры функций" Foreground="#F8FAFC">
+                <MenuItem Header="Парабола: x^2 - 4*x + 3 на [0; 5]" Click="MenuExample1_Click" Foreground="#0F172A" />
+                <MenuItem Header="Квадратичная: 2*x^2 + 3*x - 5 на [-3; 2]" Click="MenuExample2_Click" Foreground="#0F172A" />
+                <MenuItem Header="Квадрат: (x - 2)^2 + 1 на [0; 4]" Click="MenuExample3_Click" Foreground="#0F172A" />
+                <MenuItem Header="Кубическая: x^3 - 3*x на [0; 2]" Click="MenuExample4_Click" Foreground="#0F172A" />
+                <MenuItem Header="Тригонометрия: sin(x) + x^2 / 4 на [-3; 2]" Click="MenuExample5_Click" Foreground="#0F172A" />
+            </MenuItem>
+
+            <MenuItem Header="_Справка" Foreground="#F8FAFC">
+                <MenuItem Header="Задание к лабораторной работе №1" Click="MenuHelpTask_Click" Foreground="#0F172A" />
+                <MenuItem Header="О методе дихотомии" Click="MenuHelpTheory_Click" Foreground="#0F172A" />
+            </MenuItem>
+        </Menu>
+
+        <!-- 2. Панель параметров входных данных -->
+        <Border Grid.Row="1" Background="#1E293B" BorderBrush="#334155" BorderThickness="0,0,0,1" Padding="12,10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Верхний ряд: f(x), a, b, e и кнопки -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2.5*" /> <!-- f(x) -->
+                        <ColumnDefinition Width="Auto" /> <!-- a -->
+                        <ColumnDefinition Width="Auto" /> <!-- b -->
+                        <ColumnDefinition Width="Auto" /> <!-- e -->
+                        <ColumnDefinition Width="Auto" /> <!-- Кнопки действий -->
+                    </Grid.ColumnDefinitions>
+
+                    <!-- f(x) -->
+                    <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                        <TextBlock Text="ФОРМУЛА ФУНКЦИИ f(x):" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,4" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="TxtFormula" Grid.Column="0" Text="x^2 - 4*x + 3" FontSize="13" FontWeight="SemiBold"
+                                     ToolTip="Введите формулу, например: x^2 - 4*x + 3 или sin(x)" />
+                            <ComboBox x:Name="ComboPresets" Grid.Column="1" Width="30" Margin="4,0,0,0" ToolTip="Выбрать типовой пример"
+                                      SelectionChanged="ComboPresets_SelectionChanged" Background="#0F172A">
+                                <ComboBoxItem Content="x^2 - 4*x + 3" />
+                                <ComboBoxItem Content="2*x^2 + 3*x - 5" />
+                                <ComboBoxItem Content="(x - 2)^2 + 1" />
+                                <ComboBoxItem Content="x^3 - 3*x" />
+                                <ComboBoxItem Content="x^2 - 4" />
+                            </ComboBox>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Интервал a и b -->
+                    <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                        <TextBlock Text="ИНТЕРВАЛ [a; b]" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,4" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="a =" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="12" />
+                            <TextBox x:Name="TxtA" Width="55" Text="0" ToolTip="Левая граница интервала" />
+                            <TextBlock Text="b =" VerticalAlignment="Center" Margin="8,0,4,0" FontSize="12" />
+                            <TextBox x:Name="TxtB" Width="55" Text="5" ToolTip="Правая граница интервала" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Погрешность e -->
+                    <StackPanel Grid.Column="2" Margin="0,0,14,0">
+                        <TextBlock Text="ТОЧНОСТЬ e" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,4" />
+                        <TextBox x:Name="TxtEpsilon" Width="75" Text="0.001" ToolTip="Заданная погрешность (epsilon > 0)" />
+                    </StackPanel>
+
+                    <!-- Кнопки Рассчитать, График, Очистить -->
+                    <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Bottom">
+                        <Button x:Name="BtnCalculate" Content="▶ Рассчитать" Background="#10B981" Foreground="White"
+                                FontWeight="Bold" Padding="12,6" Margin="0,0,8,0" BorderThickness="0"
+                                Click="BtnCalculate_Click" />
+                        <Button x:Name="BtnPlot" Content="📈 График" Background="#2563EB" Foreground="White"
+                                FontWeight="SemiBold" Padding="10,6" Margin="0,0,8,0" BorderThickness="0"
+                                Click="BtnPlot_Click" />
+                        <Button x:Name="BtnClear" Content="⏹ Очистить" Background="#334155" Foreground="#F8FAFC"
+                                Padding="10,6" BorderThickness="0" Click="BtnClear_Click" />
+                    </StackPanel>
+                </Grid>
+
+                <!-- Нижний ряд: выбор режима расчета -->
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,8,0,0">
+                    <TextBlock Text="Режим расчёта:" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" VerticalAlignment="Center" Margin="0,0,10,0" />
+                    <RadioButton x:Name="RadioMin" Content="Поиск локального минимума (Задание)" IsChecked="True" />
+                    <RadioButton x:Name="RadioRoot" Content="Поиск корня f(x) = 0 / смена знака (Заметки)" />
+                    <RadioButton x:Name="RadioBoth" Content="Оба расчёта (Минимум + Корень)" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 3. Центральная часть: График (слева) + Карточка сводки (справа) -->
+        <Grid Grid.Row="2" Margin="10,10,10,6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="340" MinWidth="260" MaxWidth="440" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Компонент векторного графика -->
+            <components:FunctionPlotCanvas x:Name="PlotControl" Grid.Column="0" />
+
+            <GridSplitter Grid.Column="1" Width="6" Background="Transparent" ResizeBehavior="PreviousAndNext" />
+
+            <!-- Карточка сводных результатов -->
+            <Border Grid.Column="2" Background="#1E293B" CornerRadius="8" BorderBrush="#334155" BorderThickness="1" Padding="14">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="ИТОГОВЫЙ РЕЗУЛЬТАТ" FontSize="12" FontWeight="Bold" Foreground="#38BDF8" Margin="0,0,0,10" />
+
+                        <!-- Блок найденного минимума -->
+                        <Border Background="#0F172A" CornerRadius="6" BorderBrush="#334155" BorderThickness="1" Padding="10" Margin="0,0,0,8">
+                            <StackPanel>
+                                <TextBlock Text="ТОЧКА ЛОКАЛЬНОГО МИНИМУМА" FontSize="11" FontWeight="Bold" Foreground="#10B981" Margin="0,0,0,4" />
+                                <Grid Margin="0,2,0,2">
+                                    <TextBlock Text="x_min =" FontSize="12" Foreground="#94A3B8" />
+                                    <TextBlock x:Name="TxtResultMinX" Text="—" FontSize="13" FontWeight="Bold" Foreground="#F8FAFC" HorizontalAlignment="Right" />
+                                </Grid>
+                                <Grid Margin="0,2,0,2">
+                                    <TextBlock Text="f(x_min) =" FontSize="12" Foreground="#94A3B8" />
+                                    <TextBlock x:Name="TxtResultMinY" Text="—" FontSize="13" FontWeight="Bold" Foreground="#F8FAFC" HorizontalAlignment="Right" />
+                                </Grid>
+                                <Grid Margin="0,2,0,2">
+                                    <TextBlock Text="Итераций:" FontSize="12" Foreground="#94A3B8" />
+                                    <TextBlock x:Name="TxtResultMinIter" Text="—" FontSize="12" Foreground="#CBD5E1" HorizontalAlignment="Right" />
+                                </Grid>
+                                <Grid Margin="0,2,0,2">
+                                    <TextBlock Text="Точность:" FontSize="12" Foreground="#94A3B8" />
+                                    <TextBlock x:Name="TxtResultMinPrec" Text="—" FontSize="12" Foreground="#CBD5E1" HorizontalAlignment="Right" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Блок найденного корня -->
+                        <Border Background="#0F172A" CornerRadius="6" BorderBrush="#334155" BorderThickness="1" Padding="10" Margin="0,0,0,8">
+                            <StackPanel>
+                                <TextBlock Text="КОРЕНЬ УРАВНЕНИЯ f(x) = 0" FontSize="11" FontWeight="Bold" Foreground="#F59E0B" Margin="0,0,0,4" />
+                                <Grid Margin="0,2,0,2">
+                                    <TextBlock Text="x_root =" FontSize="12" Foreground="#94A3B8" />
+                                    <TextBlock x:Name="TxtResultRootX" Text="—" FontSize="13" FontWeight="Bold" Foreground="#F8FAFC" HorizontalAlignment="Right" />
+                                </Grid>
+                                <Grid Margin="0,2,0,2">
+                                    <TextBlock Text="f(x_root) =" FontSize="12" Foreground="#94A3B8" />
+                                    <TextBlock x:Name="TxtResultRootY" Text="—" FontSize="13" FontWeight="Bold" Foreground="#F8FAFC" HorizontalAlignment="Right" />
+                                </Grid>
+                                <Grid Margin="0,2,0,2">
+                                    <TextBlock Text="Итераций:" FontSize="12" Foreground="#94A3B8" />
+                                    <TextBlock x:Name="TxtResultRootIter" Text="—" FontSize="12" Foreground="#CBD5E1" HorizontalAlignment="Right" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Дополнительная информация -->
+                        <Grid Margin="0,4,0,2">
+                            <TextBlock Text="Время расчёта:" FontSize="11" Foreground="#94A3B8" />
+                            <TextBlock x:Name="TxtResultTime" Text="—" FontSize="11" FontWeight="SemiBold" Foreground="#38BDF8" HorizontalAlignment="Right" />
+                        </Grid>
+
+                        <Border Background="#1E293B" CornerRadius="4" Padding="6" Margin="0,10,0,0">
+                            <TextBlock x:Name="TxtResultNote" Text="Задайте параметры и нажмите «Рассчитать»." FontSize="11" Foreground="#94A3B8" TextWrapping="Wrap" />
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- 4. Нижняя часть: Таблица шагов итераций (DataGrid) -->
+        <Border Grid.Row="3" Background="#1E293B" BorderBrush="#334155" BorderThickness="0,1,0,0" Padding="10,6">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="ПРОТОКОЛ ИТЕРАЦИЙ МЕТОДА ПОЛОВИННОГО ДЕЛЕНИЯ" FontSize="11" FontWeight="Bold" Foreground="#38BDF8" VerticalAlignment="Center" />
+                    <TextBlock x:Name="TxtStepsCount" Grid.Column="1" Text="Шагов: 0" FontSize="11" Foreground="#94A3B8" VerticalAlignment="Center" />
+                </Grid>
+
+                <DataGrid x:Name="GridSteps" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True"
+                          Background="#0F172A" Foreground="#F8FAFC"
+                          RowBackground="#1E293B" AlternatingRowBackground="#182234"
+                          BorderBrush="#334155" GridLinesVisibility="All" HorizontalGridLinesBrush="#334155" VerticalGridLinesBrush="#334155"
+                          HeadersVisibility="Column" SelectionMode="Single">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="№" Binding="{Binding StepNumber}" Width="45" FontWeight="Bold" />
+                        <DataGridTextColumn Header="a" Binding="{Binding FormattedA}" Width="*" />
+                        <DataGridTextColumn Header="b" Binding="{Binding FormattedB}" Width="*" />
+                        <DataGridTextColumn Header="x1 / c" Binding="{Binding FormattedX1}" Width="*" />
+                        <DataGridTextColumn Header="x2" Binding="{Binding FormattedX2}" Width="*" />
+                        <DataGridTextColumn Header="f(x1) / f(c)" Binding="{Binding FormattedF1}" Width="*" />
+                        <DataGridTextColumn Header="f(x2)" Binding="{Binding FormattedF2}" Width="*" />
+                        <DataGridTextColumn Header="|b - a|" Binding="{Binding FormattedLength}" Width="100" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <!-- 5. Строка состояния -->
+        <StatusBar Grid.Row="4" Background="#0F172A" Foreground="#94A3B8" BorderBrush="#334155" BorderThickness="0,1,0,0" Padding="4,2">
+            <StatusBarItem>
+                <TextBlock x:Name="StatusMessage" Text="Готово к работе. Введите формулу и интервал или выберите готовый пример." FontSize="11" />
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>

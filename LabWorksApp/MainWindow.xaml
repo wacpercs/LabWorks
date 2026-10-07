@@ -34,7 +34,7 @@
                 
                 <ComboBox Grid.Column="1" x:Name="ComboLabSelect" Width="280" Height="32" VerticalContentAlignment="Center"
                           Background="#0F172A" Foreground="#0F172A" SelectedIndex="3">
-                    <ComboBoxItem Content="Лабораторная работа №1 (В разработке)" />
+                    <ComboBoxItem Content="Лабораторная работа №1: Численные методы (Дихотомия)" FontWeight="Bold" />
                     <ComboBoxItem Content="Лабораторная работа №2 (В разработке)" />
                     <ComboBoxItem Content="Лабораторная работа №3 (В разработке)" />
                     <ComboBoxItem Content="Лабораторная работа №4: Алгоритмы сортировки" FontWeight="Bold" />
@@ -50,8 +50,8 @@
         <!-- Сетка карточек лабораторных работ -->
         <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
             <UniformGrid Columns="2" Margin="-6">
-                <!-- Карточка Лаб 1 -->
-                <Border Background="#1E293B" CornerRadius="8" BorderBrush="#334155" BorderThickness="1" Padding="16" Margin="6" Opacity="0.75">
+                <!-- Карточка Лаб 1 (АКТИВНАЯ) -->
+                <Border Background="#1E293B" CornerRadius="8" BorderBrush="#0284C7" BorderThickness="2" Padding="16" Margin="6">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -59,13 +59,16 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <StackPanel Grid.Row="0" Orientation="Horizontal">
-                            <TextBlock Text="Лабораторная работа №1" FontSize="15" FontWeight="Bold" Foreground="#E2E8F0" />
-                            <Border Background="#334155" CornerRadius="4" Padding="6,2" Margin="8,0,0,0">
-                                <TextBlock Text="В разработке" FontSize="10" Foreground="#94A3B8" />
+                            <TextBlock Text="Лабораторная работа №1" FontSize="15" FontWeight="Bold" Foreground="#38BDF8" />
+                            <Border Background="#065F46" CornerRadius="4" Padding="6,2" Margin="8,0,0,0">
+                                <TextBlock Text="ГОТОВА К РАБОТЕ" FontSize="10" FontWeight="Bold" Foreground="#6EE7B7" />
                             </Border>
                         </StackPanel>
-                        <TextBlock Grid.Row="1" Text="Базовые структуры данных и операции." FontSize="12" Foreground="#94A3B8" Margin="0,8,0,12" TextWrapping="Wrap" />
-                        <Button Grid.Row="2" Content="Открыть" Background="#334155" Foreground="#94A3B8" BorderThickness="0" Padding="12,6" HorizontalAlignment="Left" Click="BtnPlaceholder_Click" Tag="1" />
+                        <TextBlock Grid.Row="1" Text="Поиск локального минимума функции f(x) и корней на интервале [a, b] методом половинного деления (дихотомии). Интерактивный векторный график, масштабирование, протокол итераций в DataGrid."
+                                   FontSize="12" Foreground="#CBD5E1" Margin="0,8,0,12" TextWrapping="Wrap" />
+                        <Button Grid.Row="2" Content="Запустить Лабораторную №1 ▶" Background="#0284C7" Foreground="White"
+                                FontWeight="Bold" BorderThickness="0" Padding="14,8" HorizontalAlignment="Left"
+                                Click="BtnOpenLab1_Click" />
                     </Grid>
                 </Border>
 
