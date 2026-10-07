@@ -41,4 +41,8 @@ Android/
 Loggy/
 TGBot/
 
-
+## Office & Word documents
+*.docx
+*.doc
+*.docm
+*.dotx
